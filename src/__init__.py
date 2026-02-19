@@ -1,0 +1,3 @@
+"""
+src — Application source package.
+"""

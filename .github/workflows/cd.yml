@@ -1,0 +1,28 @@
+name: CD - Deploy to Staging
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build Docker image
+      run: docker build -t project_20260219_213538:${{ github.sha }} .
+
+    - name: Run smoke tests
+      run: |
+        docker run --rm \
+          -e DATABASE_URL="sqlite:///:memory:" \
+          project_20260219_213538:${{ github.sha }} \
+          python -c "from src.database.models import Base, Link, ClickEvent; print('Models import OK')"
+
+    - name: Deploy (placeholder)
+      run: |
+        echo "Deployment step - configure your deployment here"
+        echo "Options: Fly.io, Railway, Render, VPS with Docker, etc."
+        echo "Image: project_20260219_213538:${{ github.sha }}"

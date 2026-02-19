@@ -1,0 +1,31 @@
+name: PR Quality Check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Cache pip packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-lint-${{ hashFiles('requirements.txt') }}
+
+    - name: Install linters
+      run: pip install ruff black
+
+    - name: Check formatting (black)
+      run: black --check .
+
+    - name: Lint (ruff)
+      run: ruff check .

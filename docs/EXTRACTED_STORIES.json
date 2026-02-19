@@ -1,0 +1,138 @@
+[
+  {
+    "title": "Shorten a URL via API",
+    "description": "As a developer, I want to POST a long URL to an API endpoint and receive a short URL, so that I can automate link creation from scripts and CI pipelines.",
+    "acceptance_criteria": [
+      "POST /api/shorten accepts {\"url\": \"<long_url>\"} with Content-Type: application/json",
+      "Response returns {\"short_code\": \"<code>\", \"short_url\": \"<base_url>/<code>\", \"original_url\": \"<long_url>\"}",
+      "Returns HTTP 422 if the URL is missing or malformed",
+      "Response time ≤ 200 ms for 99th percentile"
+    ],
+    "priority": "high",
+    "story_points": 3,
+    "labels": ["feature", "backend", "api"],
+    "epic": "URL Shortening"
+  },
+  {
+    "title": "Custom Short Code",
+    "description": "As a developer, I want to specify my own short code when shortening a URL, so that the resulting link is memorable and brand-consistent.",
+    "acceptance_criteria": [
+      "POST /api/shorten accepts optional \"code\": \"<custom_code>\" field",
+      "Short code must be 3–32 alphanumeric characters (hyphens and underscores allowed)",
+      "Returns HTTP 409 if the requested code is already taken",
+      "Auto-generates a code if the code field is omitted"
+    ],
+    "priority": "medium",
+    "story_points": 2,
+    "labels": ["feature", "backend", "api"],
+    "epic": "URL Shortening"
+  },
+  {
+    "title": "View Click Analytics via API",
+    "description": "As a developer, I want to retrieve click counts and timestamps for a short link via API, so that I can display analytics in my own dashboard.",
+    "acceptance_criteria": [
+      "GET /api/analytics/{code} returns {\"code\": ..., \"original_url\": ..., \"clicks\": <int>, \"created_at\": ..., \"click_events\": [{\"timestamp\": ..., \"ip\": ..., \"user_agent\": ...}]}",
+      "Returns HTTP 404 if the code does not exist",
+      "Data reflects all clicks since link creation"
+    ],
+    "priority": "high",
+    "story_points": 5,
+    "labels": ["feature", "backend", "api", "analytics"],
+    "epic": "Analytics"
+  },
+  {
+    "title": "Delete a Short Link via API",
+    "description": "As a developer, I want to DELETE a short link by its code, so that I can clean up expired or incorrect links programmatically.",
+    "acceptance_criteria": [
+      "DELETE /api/links/{code} removes the link and all associated analytics",
+      "Returns HTTP 204 on success",
+      "Returns HTTP 404 if the code does not exist",
+      "Subsequent redirects to the deleted code return HTTP 404"
+    ],
+    "priority": "medium",
+    "story_points": 2,
+    "labels": ["feature", "backend", "api"],
+    "epic": "Link Management"
+  },
+  {
+    "title": "Shorten a URL via Web Form",
+    "description": "As a marketer, I want to paste a URL into a web form and receive a short link, so that I can quickly shorten links without using the command line.",
+    "acceptance_criteria": [
+      "Home page (GET /) renders a form with a URL input field and a Submit button",
+      "Submitting the form displays the generated short URL inline with a one-click copy button",
+      "Invalid URLs show an inline error message (no full-page reload required)",
+      "Works on mobile screen widths ≥ 375 px"
+    ],
+    "priority": "high",
+    "story_points": 5,
+    "labels": ["feature", "frontend", "ui"],
+    "epic": "URL Shortening"
+  },
+  {
+    "title": "View All Links Dashboard",
+    "description": "As a marketer, I want to see a list of all short links I have created with their click counts, so that I can monitor link performance at a glance.",
+    "acceptance_criteria": [
+      "GET /dashboard renders a table with columns: Short Code, Original URL (truncated), Created At, Click Count",
+      "Links are sortable by Created At and Click Count",
+      "Pagination supports pages of 20 rows with next/previous navigation"
+    ],
+    "priority": "medium",
+    "story_points": 5,
+    "labels": ["feature", "frontend", "backend", "dashboard"],
+    "epic": "Link Management"
+  },
+  {
+    "title": "Disable a Short Link",
+    "description": "As a marketer, I want to deactivate a short link without deleting it, so that I can stop old campaign links from redirecting while preserving analytics history.",
+    "acceptance_criteria": [
+      "Dashboard provides a toggle or Disable button per link",
+      "Disabled links return HTTP 410 Gone on redirect",
+      "Analytics for disabled links remain accessible via the analytics endpoint",
+      "Link status (active/disabled) is visible in the dashboard table"
+    ],
+    "priority": "medium",
+    "story_points": 3,
+    "labels": ["feature", "backend", "frontend", "dashboard"],
+    "epic": "Link Management"
+  },
+  {
+    "title": "Copy Short URL to Clipboard",
+    "description": "As a marketer, I want to click a single button to copy the short URL, so that I can paste it into social media without manually selecting text.",
+    "acceptance_criteria": [
+      "A Copy button appears next to each generated short URL on the result view and dashboard",
+      "Clicking it copies the full short URL to the system clipboard",
+      "Button label changes to 'Copied!' for 2 seconds as confirmation feedback"
+    ],
+    "priority": "low",
+    "story_points": 1,
+    "labels": ["feature", "frontend", "ui"],
+    "epic": "URL Shortening"
+  },
+  {
+    "title": "Health Check Endpoint",
+    "description": "As a platform engineer, I want a /health endpoint that confirms the service and database are reachable, so that I can wire it into load-balancer and uptime checks.",
+    "acceptance_criteria": [
+      "GET /health returns {\"status\": \"ok\", \"db\": \"ok\"} with HTTP 200 when healthy",
+      "Returns {\"status\": \"error\", \"db\": \"unreachable\"} with HTTP 503 when the SQLite file cannot be accessed",
+      "Response time ≤ 50 ms"
+    ],
+    "priority": "high",
+    "story_points": 2,
+    "labels": ["feature", "backend", "api", "infrastructure"],
+    "epic": "Infrastructure"
+  },
+  {
+    "title": "List All Links via API",
+    "description": "As a platform engineer, I want to GET a paginated list of all short links via API, so that I can audit active links and integrate with internal tooling.",
+    "acceptance_criteria": [
+      "GET /api/links?page=1&limit=50 returns a paginated array of link objects",
+      "Each link object includes short_code, original_url, created_at, click_count, and status fields",
+      "Response includes pagination metadata (total, page, limit, pages)",
+      "Returns HTTP 200 with an empty array when no links exist"
+    ],
+    "priority": "medium",
+    "story_points": 3,
+    "labels": ["feature", "backend", "api"],
+    "epic": "Link Management"
+  }
+]

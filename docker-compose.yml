@@ -1,0 +1,23 @@
+version: '3.8'
+
+# Local development — uses SQLite (no external database required).
+# To use PostgreSQL instead, run:
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite:////data/app.db
+      - WORKERS=1
+    volumes:
+      # Persist the SQLite database across container restarts
+      - app_data:/data
+    restart: unless-stopped
+
+volumes:
+  app_data:
